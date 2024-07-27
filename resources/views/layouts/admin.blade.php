@@ -14,10 +14,11 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
   </head>
-  <body class="relative">
-    <div class="relative w-screen h-screen flex gap-2 z-10">
+  <body class="max-w-full relative">
+    <div class="max-w-full relative w-screen h-screen flex gap-2 z-10">
       <div class="w-1/5 py-4 px-4 h-full flex flex-col justify-between">
         <div>
           <div class="px-8 my-6 text-white">
@@ -35,6 +36,9 @@
             </a>
             <a href="{{ route('dashboard.users') }}" class="w-full px-6 py-2 font-bold rounded-lg {{ Request::is('dashboard/users') ? 'bg-white text-black' : 'text-white hover:bg-white hover:text-black transition-all cursor-pointer' }}">
               Data User
+            </a>
+            <a href="{{ route('admin.laporan.index') }}" class="w-full px-6 py-2 font-bold rounded-lg {{ Request::is('dashboard/data-laporan') ? 'bg-white text-black' : 'text-white hover:bg-white hover:text-black transition-all cursor-pointer' }}">
+              Data Laporan
             </a>
           </div>
         </div>
@@ -61,5 +65,7 @@
 
     @stack('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   </body>
 </html>

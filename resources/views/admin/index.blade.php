@@ -1,205 +1,127 @@
 @extends('layouts.admin')
 
 @section('title')
-    Admin - Manajemen Laporan
+    Admin - Dashboard
 @endsection
 
 @section('content')
-    <div class="w-4/5 p-4 h-full">
+    <div class="w-full p-4 h-full">
         <div class="bg-white w-full h-full rounded-3xl overflow-auto px-10 py-8">
-            <h1 class="font-bold text-2xl mb-6">Data Laporan</h1>
-            @if(session('success'))
-                <div class="bg-green-500 text-white p-2 rounded mb-4 mt-6">
-                    {{ session('success') }}
-                </div>
-            @endif
-            <div class="relative overflow-x-auto mt-6">
-                <table class="w-full text-sm text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">
-                                No
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Tanggal
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Nama User Pembuat
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Desa
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Kecamatan
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Bukti Foto
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Cek Lokasi
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Status
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                Aksi
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($laporans as $index => $report)
-                            <tr class="bg-white border-b">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ $index + 1 }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ $report->created_at->format('d/m/Y H:i') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ $report->createdByUser->name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ $report->village->name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {{ $report->district->name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($report->foto)
-                                        <img src="{{ asset('storage/' . $report->foto) }}" class="w-20 h-20 object-cover rounded-sm" alt="">
-                                        <a href="{{ asset('storage/' . $report->foto) }}" target="_blank" class="text-blue-500 underline">Lihat Foto</a>
-                                    @else
-                                        Tidak ada foto
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <a href="https://www.google.com/maps?q={{ $report->latitude }},{{ $report->longitude }}" target="_blank" class="text-blue-500 underline">Lihat Lokasi</a>
-                                </td>
-                                <td class="px-6 py-4 text-center whitespace-nowrap">
-                                    @if($report->status == 1)
-                                        <span class="bg-green-500 text-white px-2 py-1 rounded-lg text-xs">Tervalidasi</span>
-                                    @elseif($report->status == 0)
-                                        <span class="bg-yellow-500 text-white px-2 py-1 rounded-lg text-xs">Belum Tervalidasi</span>
-                                    @else
-                                        <span class="bg-red-500 text-white px-2 py-1 rounded-lg text-xs">Ditolak</span>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if(!$report->status)
-                                        <form action="{{ route('dashboard.reports.validate', $report) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="bg-green-500 text-white p-2 rounded validate-report flex items-center">
-                                                <span class="mr-1"><i class="fas fa-check"></i></span> Validasi
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('dashboard.reports.reject', $report) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" class="bg-red-500 text-white p-2 rounded reject-report flex items-center">
-                                                <span class="mr-1"><i class="fa-solid fa-xmark"></i></span> Tolak
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+            <h1 class="font-bold text-2xl mb-6">Admin Dashboard</h1>
+            <div class="flex flex-wrap gap-6">
+                <!-- Card for Total Users -->
+                <a href="{{ route('dashboard.users') }}" class="flex-1 min-w-[280px] bg-blue-500 text-white rounded-lg shadow-lg p-6 flex items-center transition-transform transform hover:scale-105">
+                    <div class="text-center flex-1">
+                        <h2 class="text-3xl font-bold">{{ $userCount }}</h2>
+                        <p class="mt-2 text-sm">Jumlah Data User</p>
+                    </div>
+                    <div class="ml-6 flex-shrink-0">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                </a>
+
+                <!-- Card for Total Reports Today -->
+                <a href="{{ route('admin.laporan.index') }}" class="flex-1 min-w-[280px] bg-green-500 text-white rounded-lg shadow-lg p-6 flex items-center transition-transform transform hover:scale-105">
+                    <div class="text-center flex-1">
+                        <h2 class="text-3xl font-bold">{{ $todayLaporans }}</h2>
+                        <p class="mt-2 text-sm">Jumlah Data Laporan Hari Ini</p>
+                    </div>
+                    <div class="ml-6 flex-shrink-0">
+                        <i class="fas fa-calendar-day fa-3x"></i>
+                    </div>
+                </a>
+
+                <!-- Card for Unvalidated Reports Today -->
+                <a href="{{ route('admin.laporan.index') }}" class="flex-1 min-w-[280px] bg-yellow-500 text-white rounded-lg shadow-lg p-6 flex items-center transition-transform transform hover:scale-105">
+                    <div class="text-center flex-1">
+                        <h2 class="text-3xl font-bold">{{ $todayUnvalidatedLaporans }}</h2>
+                        <p class="mt-2 text-sm">Jumlah Data Laporan Belum Tervalidasi</p>
+                    </div>
+                    <div class="ml-6 flex-shrink-0">
+                        <i class="fas fa-hourglass-half fa-3x"></i>
+                    </div>
+                </a>
+
+                <!-- Card for Validated Reports Today -->
+                <a href="{{ route('admin.laporan.index') }}" class="flex-1 min-w-[280px] bg-green-600 text-white rounded-lg shadow-lg p-6 flex items-center transition-transform transform hover:scale-105">
+                    <div class="text-center flex-1">
+                        <h2 class="text-3xl font-bold">{{ $todayValidatedLaporans }}</h2>
+                        <p class="mt-2 text-sm">Jumlah Data Laporan Tervalidasi</p>
+                    </div>
+                    <div class="ml-6 flex-shrink-0">
+                        <i class="fas fa-check-circle fa-3x"></i>
+                    </div>
+                </a>
+
+                <!-- Card for Rejected Reports Today -->
+                <a href="{{ route('admin.laporan.index') }}" class="flex-1 min-w-[280px] bg-red-500 text-white rounded-lg shadow-lg p-6 flex items-center transition-transform transform hover:scale-105">
+                    <div class="text-center flex-1">
+                        <h2 class="text-3xl font-bold">{{ $todayRejectedLaporans }}</h2>
+                        <p class="mt-2 text-sm">Jumlah Data Laporan Ditolak</p>
+                    </div>
+                    <div class="ml-6 flex-shrink-0">
+                        <i class="fas fa-times-circle fa-3x"></i>
+                    </div>
+                </a>
             </div>
+
+             <!-- Map Container -->
+             <h1 class="mt-8 mb-2 text-base font-bold">Sebaran Lokasi Pekerjaan Hari ini</h1>
+            <div id="map" class="w-full overflow-auto" style="height: 500px; margin-bottom: 20px;"></div>
         </div>
     </div>
 
-    <!-- Script Sweet Alert -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const deleteButtons = document.querySelectorAll('.delete-report');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: "Anda tidak akan dapat mengembalikan ini!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Ya, hapus saja!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Submit form untuk menghapus laporan
-                            this.parentNode.submit();
-                        }
-                    });
-                });
-            });
+            // Initialize map
+            var map = L.map('map').setView([-7.2078, 107.8890], 12);
 
-            const validateButtons = document.querySelectorAll('.validate-report');
-            validateButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: "Laporan ini akan divalidasi!",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Ya, validasi!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Submit form untuk validasi laporan
-                            this.parentNode.submit();
-                        }
-                    });
-                });
-            });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
-            const rejectButtons = document.querySelectorAll('.reject-report');
-            rejectButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: 'Apakah Anda yakin?',
-                        text: "Laporan ini akan ditolak!",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Ya, tolak!',
-                        cancelButtonText: 'Batal'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Submit form untuk validasi laporan
-                            this.parentNode.submit();
-                        }
-                    });
-                });
-            });
+            var markers = [];
 
-            // Menampilkan Sweet Alert untuk pesan success atau error
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sukses!',
-                    text: '{{ session('success') }}',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            @endif
+            function loadLaporanData() {
+                var today = new Date().toISOString().split('T')[0];
+                $.ajax({
+                    type: "GET",
+                    url: '{{ route('admin.laporan.getDataPerDate') }}', // Adjust the URL if necessary
+                    data: { date: today },
+                    success: function (response) {
+                        // Clear existing markers
+                        markers.forEach(function (marker) {
+                            map.removeLayer(marker);
+                        });
+                        markers = [];
 
-            @if(session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: '{{ session('error') }}',
-                    showConfirmButton: false,
-                    timer: 2000
+                        // Update map markers
+                        response.laporans.forEach(function (report) {
+                            var lat = parseFloat(report.latitude);
+                            var lon = parseFloat(report.longitude);
+
+                            var imageUrl = report.foto ? '{{ asset("storage") }}/' + report.foto : '';
+
+                            var popupContent = `
+                                <div class="w-full aspect-square mb-2" style="height: 100px;">
+                                    <img src="${imageUrl}" class="w-full h-full object-cover" alt="">
+                                </div>
+                                <b>Nama Petugas:</b> ${report.created_by_user.name}<br>
+                                <b>Desa:</b> ${report.village.name}<br>
+                                <b>Kecamatan:</b> ${report.district.name}<br>
+                                <b>Tanggal:</b> ${new Date(report.created_at).toLocaleString()}<br>
+                                <b>Status:</b> ${report.status == 1 ? 'Tervalidasi' : report.status == 0 ? 'Belum Tervalidasi' : 'Ditolak'}<br>
+                            `;
+
+                            var marker = L.marker([lat, lon]).addTo(map);
+                            marker.bindPopup(popupContent);
+                            markers.push(marker);
+                        });
+                    }
                 });
-            @endif
+            }
+
+            loadLaporanData();
         });
     </script>
 @endsection

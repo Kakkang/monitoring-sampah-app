@@ -11,6 +11,33 @@ use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
+    public function index(Request $request)
+    {
+        $authUser = Auth::user();
+        $dateFilter = $request->input('date', now()->format('Y-m-d'));
+
+        $laporans = Laporan::with(['createdByUser', 'village', 'district'])
+            ->whereDate('created_at', $dateFilter)
+            ->latest()
+            ->get();
+
+        return view('admin.laporan.index', compact('authUser', 'laporans', 'dateFilter'));
+    }
+
+
+    public function getDatabyDate(Request $request)
+    {
+        $dateFilter = $request->input('date', now()->format('Y-m-d'));
+
+        $laporans = Laporan::with(['createdByUser', 'village', 'district'])
+            ->whereDate('created_at', $dateFilter)
+            ->latest()
+            ->get();
+
+        return response()->json(['laporans' => $laporans]);
+    }
+
+
     public function create()
     {
         $kecamatans = District::where('regency_id', 3205)->get();
@@ -141,7 +168,7 @@ class LaporanController extends Controller
             $report->update(['status' => 1]);
 
             // Redirect kembali dengan pesan sukses
-            return redirect()->route('dashboard.index')->with('success', 'Laporan telah berhasil divalidasi.');
+            return redirect()->route('admin.laporan.index')->with('success', 'Laporan telah berhasil divalidasi.');
         }
 
         // Jika user bukan admin, redirect ke halaman beranda
@@ -157,7 +184,7 @@ class LaporanController extends Controller
             $report->update(['status' => 2]);
 
             // Redirect kembali dengan pesan sukses
-            return redirect()->route('dashboard.index')->with('success', 'Laporan telah berhasil ditolak.');
+            return redirect()->route('admin.laporan.index')->with('success', 'Laporan telah berhasil ditolak.');
         }
 
         // Jika user bukan admin, redirect ke halaman beranda

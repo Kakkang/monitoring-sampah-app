@@ -21,8 +21,10 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('dashboard')->group(func
         Route::get('/users/{user}/edit', [UsersController::class, 'edit'])->name('dashboard.users.edit');
         Route::put('/users/{user}', [UsersController::class, 'update'])->name('dashboard.users.update');
         Route::delete('/users/{user}', [UsersController::class, 'destroy'])->name('dashboard.users.destroy');
-        Route::patch('laporan/{report}/validate', [LaporanController::class, 'validateReport'])->name('dashboard.reports.validate');
-        Route::patch('laporan/{report}/reject', [LaporanController::class, 'rejectReport'])->name('dashboard.reports.reject');
+        Route::get('/data-laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+        Route::get('/data-laporan/filter-by-date', [LaporanController::class, 'getDatabyDate'])->name('admin.laporan.getDataPerDate');
+        Route::patch('data-laporan/{report}/validate', [LaporanController::class, 'validateReport'])->name('dashboard.reports.validate');
+        Route::patch('data-laporan/{report}/reject', [LaporanController::class, 'rejectReport'])->name('dashboard.reports.reject');
     });
 
     Route::middleware(['petugas'])->group(function() {
